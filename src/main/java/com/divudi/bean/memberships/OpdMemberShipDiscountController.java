@@ -6,7 +6,7 @@
  * and
  * a Set of Related Tools
  */
-package com.divudi.bean.memberShip;
+package com.divudi.bean.memberships;
 import com.divudi.bean.common.SessionController;
 import com.divudi.bean.common.UtilityController;
 import com.divudi.data.BillType;

@@ -1,12 +1,4 @@
-/*
- * MSc(Biomedical Informatics) Project
- *
- * Development and Implementation of a Web-based Combined Data Repository of
- Genealogical, Clinical, Laboratory and Genetic Data
- * and
- * a Set of Related Tools
- */
-package com.divudi.bean.membership;
+package com.divudi.bean.memberships;
 
 import com.divudi.bean.common.SessionController;
 import com.divudi.bean.common.UtilityController;
@@ -31,6 +23,9 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 import javax.inject.Inject;
 import javax.inject.Named;
+
+
+
 
 /**
  *
@@ -227,9 +222,6 @@ public class PaymentSchemeController implements Serializable {
 
         paymentSchemeAllowedPaymentMethod = null;
         createAllowedPaymentMethods();
-        //  createPaymentSchemesMembership();
-        //    recreateModel();
-
     }
 
     public void setSelectText(String selectText) {
@@ -267,7 +259,6 @@ public class PaymentSchemeController implements Serializable {
     }
 
     public void delete() {
-
         if (paymentScheme != null) {
             paymentScheme.setRetired(true);
             paymentScheme.setRetiredAt(new Date());
@@ -298,7 +289,6 @@ public class PaymentSchemeController implements Serializable {
         String temSql;
         temSql = "SELECT i FROM PaymentScheme i "
                 + " where  i.retired=false "
-                //+ " and i.membershipScheme is null "
                 + " order by i.orderNo, i.name";
         items = getFacade().findBySQL(temSql);
     }
@@ -318,8 +308,8 @@ public class PaymentSchemeController implements Serializable {
     public List<PaymentScheme> createPaymentSchemes(boolean opd, boolean pharmacy, boolean channel) {
         String temSql;
         temSql = "SELECT i FROM PaymentScheme i "
-                + " where  i.retired=false ";
-
+                + " where "
+                + " i.retired=false ";
         if (pharmacy) {
             temSql += " and i.validForPharmacy=true ";
         }

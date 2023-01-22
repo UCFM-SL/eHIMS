@@ -1,4 +1,4 @@
-package com.divudi.bean.memberShip;
+package com.divudi.bean.memberships;
 
 import com.divudi.bean.common.EnumController;
 import com.divudi.bean.common.InstitutionController;

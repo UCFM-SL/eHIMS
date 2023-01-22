@@ -14,7 +14,7 @@ import com.divudi.bean.common.PriceMatrixController;
 import com.divudi.bean.common.SessionController;
 import com.divudi.bean.common.UtilityController;
 import com.divudi.bean.common.WebUserController;
-import com.divudi.bean.memberShip.MembershipSchemeController;
+import com.divudi.bean.memberships.MembershipSchemeController;
 import com.divudi.data.BillClassType;
 import com.divudi.data.BillNumberSuffix;
 import com.divudi.data.BillType;
