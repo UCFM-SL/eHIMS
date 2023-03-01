@@ -56,11 +56,10 @@
                                     <p:watermark value="Return  Dealer/Supplier" for="acDept"/>
 
                                 </f:facet>
-                                <h:panelGrid columns="1" >
-                                    <h:panelGrid columns="6" >
-                                        <h:panelGrid columns="1" >
+                                
+                                    <p:panelGrid columns="2" class="w-100" >
+                                        
                                             <p:outputLabel value="Medicines/Devices" ></p:outputLabel>
-                                            <style>.ui-autocomplete-input {width:300px!important;}</style>
                                             <p:autoComplete accesskey="i"   forceSelection="true"  id="acStock" 
                                                             value="#{pharmacyReturnwithouttresing.stock}" 
                                                             converter="stockCon" 
@@ -94,26 +93,23 @@
                                                         update="txtQty txtRate focusQty" ></p:ajax>
                                             </p:autoComplete>
 
-                                        </h:panelGrid>
-                                        <h:panelGrid columns="1" >
+                                       
                                             <p:outputLabel value="Quentity" ></p:outputLabel>
                                             <p:inputText autocomplete="off"  accesskey="q"   id="txtQty" value="#{pharmacyReturnwithouttresing.qty}" style="width: 50px!important;"   >
                                                 <p:ajax event="keyup"  listener="#{pharmacyReturnwithouttresing.calculateBillItemListner}" process="acStock txtQty :#{p:component('acDept')}" update="txtRate txtVal" ></p:ajax>
                                                 <p:ajax event="blur"  listener="#{pharmacyReturnwithouttresing.calculateBillItemListner}" process="acStock txtQty :#{p:component('acDept')}" update="txtRate txtVal" ></p:ajax>
                                             </p:inputText>
-                                        </h:panelGrid>
-                                        <h:panelGrid columns="1" >
+                                       
                                             <p:outputLabel value="Rate" ></p:outputLabel>
                                             <p:outputLabel id="txtRate" value="#{pharmacyReturnwithouttresing.billItem.netRate}" >
                                                 <f:convertNumber pattern="#,##0.00" />
                                             </p:outputLabel>
-                                        </h:panelGrid>
-                                        <h:panelGrid columns="1" >
+                                        
                                             <p:outputLabel value="Value" ></p:outputLabel>
                                             <p:outputLabel id="txtVal" value="#{pharmacyReturnwithouttresing.billItem.netValue}" >
                                                 <f:convertNumber pattern="#,##0.00" />
                                             </p:outputLabel>
-                                        </h:panelGrid>
+                                        
                                         <p:commandButton  accesskey="a" id="btnAdd" value="Add" 
                                                          action="#{pharmacyReturnwithouttresing.addBillItem}"
                                                           onclick="onSubmitButton();"
@@ -123,7 +119,7 @@
                                         <p:focus id="focusQty" for="txtQty" ></p:focus>
                                         <p:focus id="focusItem" for="acStock" ></p:focus>
 
-                                    </h:panelGrid>
+                                    </p:panelGrid>
 
 
                                     <p:tabView id="tabI" dynamic="true" activeIndex="#{pharmacyReturnwithouttresing.activeIndex}" >
@@ -222,7 +218,7 @@
                                     </p:tabView>
 
 
-                                </h:panelGrid>
+                             
 
                             </p:panel>
 

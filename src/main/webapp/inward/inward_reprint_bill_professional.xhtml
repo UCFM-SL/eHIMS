@@ -23,13 +23,13 @@
                             </p:panel>
                             <p:panel>
                                 <p:commandButton ajax="false" value="Mark As Checked"
-                                                action="#{inwardSearch.markAsChecked()}"
+                                                 action="#{inwardSearch.markAsChecked()}"
                                                  rendered="#{webUserController.hasPrivilege('InwardCheck')}" onclick="onSubmitButton();" />
                                 <p:commandButton ajax="false" value="Mark As Un Check"
-                                                action="#{inwardSearch.markAsUnChecked()}"
+                                                 action="#{inwardSearch.markAsUnChecked()}"
                                                  rendered="#{webUserController.hasPrivilege('InwardUnCheck')}" onclick="onSubmitButton();" />
                                 <p:commandButton ajax="false" value="Back To Intrim" action="/inward/inward_bill_intrim"
-                                                actionListener="#{bhtSummeryController.createTables()}"
+                                                 actionListener="#{bhtSummeryController.createTables()}"
                                                  onclick="onSubmitButton();" />
                             </p:panel>
 
@@ -85,8 +85,15 @@
                                     <h:outputLabel value="#{bip.billItem.item.name}"/>
                                 </p:column>
                                 <p:column>
-                                    <f:facet name="header">Fee</f:facet>
-                                    <h:outputLabel value="#{bip.feeValue}"/>
+                                    <p:cellEditor>  
+                                        <f:facet name="header">Fee</f:facet>
+                                        <f:facet name="output"> 
+                                            <h:outputLabel value="#{bip.feeValue}"/>
+                                        </f:facet>  
+                                        <f:facet name="input"> 
+                                            <h:inputText value="#{bip.feeValue}"/>
+                                        </f:facet>
+                                    </p:cellEditor>
                                 </p:column>  
                                 <p:column>
                                     <f:facet name="header">Fee Name</f:facet>
@@ -106,7 +113,7 @@
                                                             completeMethod="#{inwardProfessionalBillController.completeStaff}"
                                                             var="bifs" itemLabel="#{bifs.person.name}" itemValue="#{bifs}" 
                                                             forceSelection="true"/>
-                                           
+
                                         </f:facet>  
                                     </p:cellEditor>  
 

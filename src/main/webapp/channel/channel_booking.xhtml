@@ -125,7 +125,7 @@
                             </h:outputText>
                             <h:outputText value=" &nbsp;&nbsp;" />
                             <h:outputText value="#{ses.startingTime}" >
-                                <f:convertDateTime  timeZone="Asia/Colombo" pattern="hh:mm a" />
+                                <f:convertDateTime  timeZone="IST" pattern="hh:mm a" />
                             </h:outputText>
                             <h:outputText value=" &nbsp;&nbsp;" />
                             <h:outputText value="#{ses.totalFee}" >
@@ -179,7 +179,7 @@
                         </p:column>
                         <p:column headerText="Time" style="width: 40px!important; text-align: center;" >
                             <h:outputText value="#{ses.startingTime}">
-                                <f:convertDateTime  timeZone="Asia/Colombo" pattern="hh:mm" />
+                                <f:convertDateTime  timeZone="IST" pattern="hh:mm" />
                             </h:outputText>
                         </p:column>
                         <p:column headerText="Fee" style="width: 40px!important; text-align: center;" >

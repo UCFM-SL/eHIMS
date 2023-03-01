@@ -307,6 +307,30 @@
                             </h:outputLabel>
                         </td>
                     </tr>
+                    
+                    
+                    <tr>
+                        <td class="totalsBlock" style="text-align: left; width: 60%;">
+                            <h:outputLabel value="Paid" />
+                        </td>
+                        <td  class="totalsBlock" style="text-align: right!important; width: 40%; padding-right: 30px;">
+                            <h:outputLabel value="#{cc.attrs.bill.cashPaid}" >
+                                <f:convertNumber pattern="#,##0.00" />
+                            </h:outputLabel>
+                        </td>
+                    </tr>
+                    
+                     <tr>
+                        <td class="totalsBlock" style="text-align: left; width: 60%;">
+                            <h:outputLabel value="Balance" />
+                        </td>
+                        <td  class="totalsBlock" style="text-align: right!important; width: 40%; padding-right: 30px;">
+                            <h:outputLabel value="#{cc.attrs.bill.balance}" >
+                                <f:convertNumber pattern="#,##0.00" />
+                            </h:outputLabel>
+                        </td>
+                    </tr>
+                    
                     <tr>
                         <td  class="totalsBlock" style="text-align: left;">
                             <h:outputLabel  rendered="#{cc.attrs.bill.discount ne 0.0}" value="Discount " style="font-weight: bolder!important;"/>

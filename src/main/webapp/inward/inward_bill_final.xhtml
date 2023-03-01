@@ -36,6 +36,8 @@
                         <h:panelGroup id="panSearch2">
                             <in:bhtDetail admission="#{bhtSummeryController.patientEncounter}"/>
                         </h:panelGroup>  
+                        #{bhtSummeryController.patientEncounter.id}
+                        #{bhtSummeryController.patientEncounter.paymentFinalized}
                         <h:panelGroup>
                             <h:panelGroup id="crd" rendered="#{bhtSummeryController.patientEncounter.paymentMethod eq 'Credit'}">
                                 <credit:outputCredit  patientEncounter="#{bhtSummeryController.patientEncounter}"/>
