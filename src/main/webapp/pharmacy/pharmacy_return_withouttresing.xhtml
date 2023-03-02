@@ -87,7 +87,7 @@
                                                         <f:convertDateTime pattern="dd MMMM yyyy" ></f:convertDateTime>
                                                     </h:outputLabel>
                                                 </p:column>
-                                                <p:ajax event="focus" process="acStock :#{p:component('acDept')}"  ></p:ajax>
+                                                <p:ajax event="focus" process="acStock :#{p:resolveFirstComponentWithId('acDept',view).clientId}"  ></p:ajax>
                                                 <p:ajax event="itemSelect"   
                                                         listener="#{pharmacyReturnwithouttresing.handleSelect}" 
                                                         update="txtQty txtRate focusQty" ></p:ajax>
@@ -95,9 +95,9 @@
 
                                        
                                             <p:outputLabel value="Quentity" ></p:outputLabel>
-                                            <p:inputText autocomplete="off"  accesskey="q"   id="txtQty" value="#{pharmacyReturnwithouttresing.qty}" style="width: 50px!important;"   >
-                                                <p:ajax event="keyup"  listener="#{pharmacyReturnwithouttresing.calculateBillItemListner}" process="acStock txtQty :#{p:component('acDept')}" update="txtRate txtVal" ></p:ajax>
-                                                <p:ajax event="blur"  listener="#{pharmacyReturnwithouttresing.calculateBillItemListner}" process="acStock txtQty :#{p:component('acDept')}" update="txtRate txtVal" ></p:ajax>
+                                            <p:inputText autocomplete="off"  accesskey="q"   id="txtQty" value="#{pharmacyReturnwithouttresing.qty}" style="width: 50px!important;">
+                                                <p:ajax event="keyup"  listener="#{pharmacyReturnwithouttresing.calculateBillItemListner}" process="acStock txtQty :#{p:resolveFirstComponentWithId('acDept',view).clientId}" update="txtRate txtVal" ></p:ajax>
+                                                <p:ajax event="blur"  listener="#{pharmacyReturnwithouttresing.calculateBillItemListner}" process="acStock txtQty :#{p:resolveFirstComponentWithId('acDept',view).clientId}" update="txtRate txtVal" ></p:ajax>
                                             </p:inputText>
                                        
                                             <p:outputLabel value="Rate" ></p:outputLabel>
@@ -113,8 +113,8 @@
                                         <p:commandButton  accesskey="a" id="btnAdd" value="Add" 
                                                          action="#{pharmacyReturnwithouttresing.addBillItem}"
                                                           onclick="onSubmitButton();"
-                                                          process="@this acStock txtQty :#{p:component('acDept')}" 
-                                                          update=":#{p:component('pBillDetails')} :#{p:component('panelError')} :#{p:component('tblBillItem')} txtRate txtQty acStock focusItem tabI" ></p:commandButton>
+                                                          process="@this acStock txtQty :#{p:resolveFirstComponentWithId('acDept',view).clientId}" 
+                                                          update=":#{p:resolveFirstComponentWithId('pBillDetails',view).clientId} :#{p:resolveFirstComponentWithId('panelError',view).clientId} :#{p:resolveFirstComponentWithId('tblBillItem',view).clientId} txtRate txtQty acStock focusItem tabI" ></p:commandButton>
 
                                         <p:focus id="focusQty" for="txtQty" ></p:focus>
                                         <p:focus id="focusItem" for="acStock" ></p:focus>
@@ -145,8 +145,8 @@
                                                     <p:dataTable id="tblBillItem" value="#{pharmacyReturnwithouttresing.preBill.billItems}"
                                                                  var="bi" rowIndexVar="s" editable="true" sortBy="#{bi.searialNo}" >
 
-                                                        <p:ajax event="rowEdit" listener="#{pharmacyReturnwithouttresing.onEdit}" update="@this gros :#{p:component('pBillDetails')}" />  
-                                                        <p:ajax event="rowEditCancel" listener="#{pharmacyReturnwithouttresing.onEdit}" update="@this gros :#{p:component('pBillDetails')}" /> 
+                                                        <p:ajax event="rowEdit" listener="#{pharmacyReturnwithouttresing.onEdit}" update="@this gros :#{p:resolveFirstComponentWithId('pBillDetails',view).clientId}" />  
+                                                        <p:ajax event="rowEditCancel" listener="#{pharmacyReturnwithouttresing.onEdit}" update="@this gros :#{p:resolveFirstComponentWithId('pBillDetails',view).clientId}" /> 
 
 
                                                         <p:column headerText="Item">
@@ -304,7 +304,7 @@
 
                         </div>
                         <!--                        <div >
-                                                    <h:panelGroup   id="gpBillPreview"   > 
+                                                    <h:panelGroup   id="gpBillPreview"> 
                                                         <phi:issue bill="#{pharmacyReturnwithouttresing.printBill}"></phi:issue>
                                                     </h:panelGroup>
                                                 </div>-->

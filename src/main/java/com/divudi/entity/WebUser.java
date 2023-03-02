@@ -1,12 +1,13 @@
 /*
  * Author : Dr. M H B Ariyaratne
  *
- * MO(Health Information), Department of Health Services, Southern Province
- * and
+ * Acting Consultant (Health Informatics), Department of Health Services, Southern Province
+ * (94) 71 5812399
  * Email : buddhika.ari@gmail.com
  */
 package com.divudi.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
@@ -21,8 +22,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author Dr. M. H. B. Ariyaratne, MBBS, PGIM Trainee for MSc(Biomedical
- * Informatics)
+ * @author Dr. M. H. B. Ariyaratne, MBBS, MSc, MD(Health Informatics)
+ * Acting Consultant (Health Informatics)
  */
 @Entity
 @XmlRootElement
@@ -49,26 +50,26 @@ public class WebUser implements Serializable {
     @OneToOne
     Person webUserPerson;
     //Main Properties
-//    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     String name;
     String description;
     //Created Properties
-    @ManyToOne
+    @ManyToOne @JsonIgnore
     WebUser creater;
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP) @JsonIgnore
     Date createdAt;
     //Retairing properties
-    boolean retired;
-    @ManyToOne
+  @JsonIgnore   boolean retired;
+    @ManyToOne @JsonIgnore
     WebUser retirer;
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP) @JsonIgnore
     Date retiredAt;
     String retireComments;
     //Activation properties
-    boolean activated;
-    @ManyToOne
+   @JsonIgnore  boolean activated;
+ @JsonIgnore    @ManyToOne
     WebUser activator;
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+  @JsonIgnore   @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     Date activatedAt;
     String activateComments;
     @ManyToOne
@@ -77,11 +78,11 @@ public class WebUser implements Serializable {
     String defLocale;
     String email;
     String telNo;
-    @ManyToOne
+    @ManyToOne @JsonIgnore
     Institution institution;
-    @ManyToOne
+    @ManyToOne @JsonIgnore
     Department department;
-    @ManyToOne
+    @ManyToOne @JsonIgnore
     Staff staff;
 
     String code;

@@ -1,6 +1,6 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Dr M H B Ariyaratne
+ * buddhika.ari@gmail.com
  */
 package com.divudi.bean.store;
 
@@ -528,9 +528,9 @@ public class StoreGrnController implements Serializable {
             }
         }
         String code = "";
-        code += getSessionController().getInstitution().getInstitutionCode();
+        code += getSessionController().getInstitution().getCode();
         code += "/";
-        code += getSessionController().getDepartment().getDepartmentCode();
+        code += getSessionController().getDepartment().getCode();
         code += "/";
         if (billItem != null && billItem.getItem() != null && billItem.getItem().getCategory() != null) {
             code += billItem.getItem().getCategory().getCode();

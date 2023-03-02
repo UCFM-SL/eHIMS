@@ -1,14 +1,15 @@
 /*
  * Author : Dr. M H B Ariyaratne
  *
- * MO(Health Information), Department of Health Services, Southern Province
- * and
+ * Acting Consultant (Health Informatics), Department of Health Services, Southern Province
+ * (94) 71 5812399
  * Email : buddhika.ari@gmail.com
  */
 package com.divudi.bean.common;
 
 import com.divudi.bean.pharmacy.PharmacySaleController;
 import com.divudi.data.DepartmentType;
+import com.divudi.data.InstitutionType;
 import com.divudi.data.Privileges;
 import com.divudi.ejb.ApplicationEjb;
 import com.divudi.ejb.CashTransactionBean;
@@ -20,6 +21,7 @@ import com.divudi.entity.Person;
 import com.divudi.entity.UserPreference;
 import com.divudi.entity.WebUser;
 import com.divudi.entity.WebUserDashboard;
+import com.divudi.entity.WebUserDepartment;
 import com.divudi.entity.WebUserPrivilege;
 import com.divudi.entity.WebUserRole;
 import com.divudi.facade.DepartmentFacade;
@@ -50,9 +52,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-import org.primefaces.event.CloseEvent;
-import org.primefaces.event.DashboardReorderEvent;
-import org.primefaces.event.ToggleEvent;
 import org.primefaces.model.DashboardColumn;
 import org.primefaces.model.DashboardModel;
 import org.primefaces.model.DefaultDashboardColumn;
@@ -60,8 +59,8 @@ import org.primefaces.model.DefaultDashboardModel;
 
 /**
  *
- * @author Dr. M. H. B. Ariyaratne, MBBS, PGIM Trainee for MSc(Biomedical
- * Informatics)
+ * @author Dr. M. H. B. Ariyaratne, MBBS, MSc, MD(Health Informatics) Acting
+ * Consultant (Health Informatics)
  */
 @Named
 @SessionScoped
@@ -95,9 +94,14 @@ public class SessionController implements Serializable, HttpSessionListener {
     ApplicationController applicationController;
     @Inject
     SearchController searchController;
-
+    @Inject
+    InstitutionController institutionController;
+    @Inject
+    DepartmentController departmentController;
     @Inject
     WebUserController webUserController;
+    @Inject
+    PersonController personController;
     /**
      * Properties
      */
@@ -106,10 +110,11 @@ public class SessionController implements Serializable, HttpSessionListener {
     private UserPreference loggedPreference;
     private UserPreference applicationPreference;
     private UserPreference institutionPreference;
+    private UserPreference departmentPreference;
     UserPreference userPreference;
     boolean logged = false;
     boolean activated = false;
-    String primeTheme;
+    private String primeTheme;
     String defLocale;
     private List<Privileges> privilegeses;
     Department department;
@@ -124,6 +129,68 @@ public class SessionController implements Serializable, HttpSessionListener {
     Bill bill;
     private DashboardModel dashboardModel;
     String loginRequestResponse;
+    private Boolean firstLogin;
+
+    private boolean websiteUserGoingToLog = false;
+
+    private String institutionName;
+    private String departmentName;
+    private String adminName;
+
+    public String createFirstLogin() {
+        Institution ins = new Institution();
+        ins.setName(institutionName);
+        ins.setInstitutionCode(institutionName);
+        ins.setCreatedAt(new Date());
+        ins.setInstitutionType(InstitutionType.Company);
+        institutionController.save(ins);
+        Department dep = new Department();
+        dep.setInstitution(ins);
+        dep.setName(departmentName);
+        dep.setPrintingName(departmentName);
+        dep.setDepartmentCode(departmentName);
+        departmentController.save(dep);
+
+        Person p = new Person();
+        p.setName(userName);
+        p.setCreatedAt(new Date());
+        personController.save(p);
+
+        WebUser wu = new WebUser();
+        wu.setWebUserPerson(p);
+        wu.setInstitution(ins);
+        wu.setDepartment(dep);
+        wu.setCreatedAt(new Date());
+        wu.setActivated(true);
+        wu.setActivatedAt( new Date());
+        wu.setName(userName);
+        wu.setWebUserPassword(getSecurityController().hash(passord));
+        webUserController.save(wu);
+
+        for (Privileges pv : Privileges.values()) {
+            WebUserPrivilege wup = new WebUserPrivilege();
+            wup.setWebUser(wu);
+            wup.setPrivilege(pv);
+            wup.setCreatedAt(new Date());
+            webUserPrivilegeFacade.create(wup);
+        }
+
+        WebUserDepartment wud = new WebUserDepartment();
+        wud.setCreatedAt(new Date());
+        wud.setDepartment(dep);
+        wud.setWebUser(wu);
+        webUserDepartmentFacade.create(wud);
+
+        firstLogin = null;
+
+        return "/index";
+
+    }
+
+    public String toLoginFromWeb() {
+        websiteUserGoingToLog = true;
+        return "";
+    }
 
     public UserPreference getCurrentPreference() {
         return currentPreference;
@@ -137,7 +204,7 @@ public class SessionController implements Serializable, HttpSessionListener {
         String jpql;
         Map m = new HashMap();
         jpql = "select p from UserPreference p where p.institution is null and p.department is null and p.webUser is null order by p.id desc";
-        currentPreference = getUserPreferenceFacade().findFirstBySQL(jpql);
+        currentPreference = getUserPreferenceFacade().findFirstByJpql(jpql);
         if (currentPreference == null) {
             currentPreference = new UserPreference();
 
@@ -147,6 +214,10 @@ public class SessionController implements Serializable, HttpSessionListener {
         currentPreference.setDepartment(null);
         currentPreference.setInstitution(null);
         return "/admin_mange_application_preferences";
+    }
+
+    public String toPublicLogin() {
+        return "/public_login";
     }
 
     public String toManageIntitutionPreferences() {
@@ -364,7 +435,9 @@ public class SessionController implements Serializable, HttpSessionListener {
     public String loginActionWithoutDepartment() {
         department = null;
         institution = null;
-        if (loginWithoutDepartment()) {
+        boolean l = checkUsersWithoutDepartment();
+        System.out.println("l = " + l);
+        if (l) {
             return "/index.xhtml";
         } else {
             UtilityController.addErrorMessage("Invalid User! Login Failure. Please try again");
@@ -407,37 +480,7 @@ public class SessionController implements Serializable, HttpSessionListener {
         }
     }
 
-    private boolean loginWithoutDepartment() {
-
-        getApplicationEjb().recordAppStart();
-
-        if (userName.trim().equals("")) {
-            UtilityController.addErrorMessage("Please enter a username");
-            return false;
-        }
-
-        if (false) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(2015, 05, 17, 23, 59, 59);//2015/june/17/23:00:00
-            calendar.set(Calendar.MILLISECOND, 999);
-
-            Date expired = calendar.getTime();
-            Date nowDate = new Date();
-
-            if (nowDate.after(expired)) {
-                UtilityController.addErrorMessage("Your Application has Expired");
-                return false;
-            }
-        }
-        // password
-        if (isFirstVisit()) {
-            prepareFirstVisit();
-            return true;
-        } else {
-
-            return checkUsersWithoutDepartment();
-        }
-    }
+    
 
     private void prepareFirstVisit() {
         WebUser user = new WebUser();
@@ -547,23 +590,14 @@ public class SessionController implements Serializable, HttpSessionListener {
     }
 
     private boolean isFirstVisit() {
-        if (getFacede().count() <= 0) {
+        String j = "Select w from WebUser w order by w.id";
+        WebUser ws = getFacede().findFirstByJpql(j);
+        if (ws == null) {
             UtilityController.addSuccessMessage("First Visit");
             return true;
         } else {
-//            UtilityController.addSuccessMessage("Welcome back");
             return false;
         }
-
-    }
-
-    public boolean isFirstLogin() {
-        if (getFacede().count() <= 1) {
-            return true;
-        } else {
-            return false;
-        }
-
     }
 
     private boolean checkUsers() {
@@ -622,7 +656,7 @@ public class SessionController implements Serializable, HttpSessionListener {
 
                         if (insPre == null) {
                             sql = "select p from UserPreference p where p.institution is null and p.department is null and p.webUser is null order by p.id desc";
-                            insPre = getUserPreferenceFacade().findFirstBySQL(sql);
+                            insPre = getUserPreferenceFacade().findFirstByJpql(sql);
 
                         }
 
@@ -646,8 +680,6 @@ public class SessionController implements Serializable, HttpSessionListener {
         }
         return false;
     }
-    
-     
 
     public void decryptAllUsers() {
         String temSQL;
@@ -677,8 +709,6 @@ public class SessionController implements Serializable, HttpSessionListener {
         return loginForRequestsForDoctors(userName, passord);
     }
 
-    
-
     public boolean loginForRequests(String temUserName, String temPassword) {
         logged = false;
         loggedUser = null;
@@ -697,7 +727,6 @@ public class SessionController implements Serializable, HttpSessionListener {
         WebUser u = getFacede().findFirstBySQL(temSQL, m);
 
         //// // System.out.println("temSQL = " + temSQL);
-
         if (u == null) {
             return false;
         }
@@ -765,15 +794,13 @@ public class SessionController implements Serializable, HttpSessionListener {
         List<WebUser> allUsers = getFacede().findBySQL(temSQL, m);
         for (WebUser u : allUsers) {
             if ((u.getName()).equalsIgnoreCase(userName)) {
-                if (getSecurityController().matchPassword(passord, u.getWebUserPassword())) {
+                if (SecurityController.matchPassword(passord, u.getWebUserPassword())) {
                     departments = listLoggableDepts(u);
                     if (departments.isEmpty()) {
                         UtilityController.addErrorMessage("This user has no privilage to login to any Department. Please conact system administrator.");
                         return false;
                     }
-
                     boolean f = false;
-
                     for (Department d : departments) {
                         if (d.equals(u.getDepartment())) {
                             f = true;
@@ -795,7 +822,7 @@ public class SessionController implements Serializable, HttpSessionListener {
                     setLoggedUser(u);
                     dashboards = webUserController.listWebUserDashboards(u);
                     loadDashboards();
-                    setLogged(Boolean.TRUE);
+                    setLogged(true);
                     setActivated(u.isActivated());
                     setRole(u.getRole());
 
@@ -817,17 +844,15 @@ public class SessionController implements Serializable, HttpSessionListener {
                         department = departments.get(0);
                         selectDepartment();
                         UtilityController.addSuccessMessage("Logged successfully. Department is " + department.getName());
+                        System.out.println("logged = " + logged);
                     } else {
-
                         UtilityController.addSuccessMessage("Logged successfully!!!." + "\n Please select a department.");
-
                         UtilityController.addSuccessMessage(setGreetingMsg() + " " + loggedUser.getWebUserPerson().getName());
-
                     }
                     if (getApplicationController().isLogged(u) != null) {
                         UtilityController.addErrorMessage("This user is already logged.");
                     }
-
+                    System.out.println("logged = " + logged);
                     return true;
                 }
             }
@@ -866,7 +891,7 @@ public class SessionController implements Serializable, HttpSessionListener {
 
     public String selectDepartment() {
         if (loggedUser == null) {
-            return "/index";
+            return "/login";
         }
         if (loggedUser.getWebUserPerson() == null) {
             Person p = new Person();
@@ -882,11 +907,11 @@ public class SessionController implements Serializable, HttpSessionListener {
         String sql;
         Map m;
 
-        UserPreference insPre;
+//        UserPreference preferances;
         sql = "select p from UserPreference p where p.department =:dep order by p.id desc";
         m = new HashMap();
         m.put("dep", department);
-        insPre = getUserPreferenceFacade().findFirstBySQL(sql, m);
+        departmentPreference = getUserPreferenceFacade().findFirstBySQL(sql, m);
 
         if (getDepartment().getDepartmentType() == DepartmentType.Pharmacy) {
             long i = searchController.createInwardBHTForIssueBillCount();
@@ -895,34 +920,44 @@ public class SessionController implements Serializable, HttpSessionListener {
             }
         }
 
-        if (insPre == null) {
-            sql = "select p from UserPreference p where p.institution =:ins order by p.id desc";
-            m = new HashMap();
-            m.put("ins", institution);
-            insPre = getUserPreferenceFacade().findFirstBySQL(sql, m);
-            if (insPre == null) {
-                sql = "select p from UserPreference p where p.institution is null and p.department is null and p.webUser is null order by p.id desc";
-                insPre = getUserPreferenceFacade().findFirstBySQL(sql);
-            }
-            if (insPre == null) {
-                insPre = new UserPreference();
-                insPre.setWebUser(null);
-                insPre.setDepartment(null);
-                insPre.setInstitution(null);
-                getUserPreferenceFacade().create(insPre);
-            }
-        }
+        sql = "select p from UserPreference p where p.institution =:ins order by p.id desc";
+        m = new HashMap();
+        m.put("ins", institution);
+        institutionPreference = getUserPreferenceFacade().findFirstBySQL(sql, m);
 
         sql = "select p from UserPreference p where p.institution is null and p.department is null and p.webUser is null order by p.id desc";
-        applicationPreference = getUserPreferenceFacade().findFirstBySQL(sql);
+        applicationPreference = getUserPreferenceFacade().findFirstByJpql(sql);
+
         if (applicationPreference == null) {
             applicationPreference = new UserPreference();
+            applicationPreference.setWebUser(null);
+            applicationPreference.setDepartment(null);
+            applicationPreference.setInstitution(null);
             getUserPreferenceFacade().create(applicationPreference);
         }
 
-        setLoggedPreference(insPre);
+        if (institutionPreference == null) {
+            institutionPreference = applicationPreference;
+        }
+        if (departmentPreference == null) {
+            departmentPreference = institutionPreference;
+        }
+
+        setLoggedPreference(departmentPreference);
         recordLogin();
-        return "/index";
+        return "/home";
+    }
+
+    private void loadApplicationPreferances() {
+        String sql = "select p from UserPreference p where p.institution is null and p.department is null and p.webUser is null order by p.id desc";
+        applicationPreference = getUserPreferenceFacade().findFirstByJpql(sql);
+        if (applicationPreference == null) {
+            applicationPreference = new UserPreference();
+            applicationPreference.setWebUser(null);
+            applicationPreference.setDepartment(null);
+            applicationPreference.setInstitution(null);
+            getUserPreferenceFacade().create(applicationPreference);
+        }
     }
 
     //get Current hour
@@ -963,7 +998,7 @@ public class SessionController implements Serializable, HttpSessionListener {
         String sql;
         Map m = new HashMap();
         m.put("wu", e);
-        sql = "select distinct(wd.department) "
+        sql = "select wd.department "
                 + " from WebUserDepartment wd "
                 + " where wd.retired=false "
                 + " and wd.department.retired=false "
@@ -993,6 +1028,7 @@ public class SessionController implements Serializable, HttpSessionListener {
 
     public void logout() {
         userPrivilages = null;
+        websiteUserGoingToLog = false;
         recordLogout();
         setLoggedUser(null);
         setLogged(false);
@@ -1162,24 +1198,22 @@ public class SessionController implements Serializable, HttpSessionListener {
         this.defLocale = defLocale;
     }
 
-    public String getPrimeTheme() {
-        if (primeTheme == null || primeTheme.equals("")) {
-            primeTheme = "hot-sneaks";
-        }
-        if (getLoggedUser() != null) {
-            if (getLoggedUser().getPrimeTheme() != null) {
-                if (!getLoggedUser().getPrimeTheme().equals("")) {
-                    return getLoggedUser().getPrimeTheme();
-                }
-            }
-        }
-        return primeTheme;
-    }
-
-    public void setPrimeTheme(String primeTheme) {
-        this.primeTheme = primeTheme;
-    }
-
+//    public String getPrimeTheme() {
+//        if (primeTheme == null || primeTheme.equals("")) {
+//            primeTheme = "hot-sneaks";
+//        }
+//        if (getLoggedUser() != null) {
+//            if (getLoggedUser().getPrimeTheme() != null) {
+//                if (!getLoggedUser().getPrimeTheme().equals("")) {
+//                    return getLoggedUser().getPrimeTheme();
+//                }
+//            }
+//        }
+//        return primeTheme;
+//    }
+//    public void setPrimeTheme(String primeTheme) {
+//        this.primeTheme = primeTheme;
+//    }
     /**
      *
      * @return
@@ -1476,20 +1510,11 @@ public class SessionController implements Serializable, HttpSessionListener {
     public void setLoginRequestResponse(String loginRequestResponse) {
         this.loginRequestResponse = loginRequestResponse;
     }
-    
-    
 
     public UserPreference getApplicationPreference() {
         if (applicationPreference == null) {
-            String sql = "";
-            sql = "select p from UserPreference p where p.institution is null and p.department is null and p.webUser is null order by p.id desc";
-            applicationPreference = getUserPreferenceFacade().findFirstBySQL(sql);
-            if (applicationPreference == null) {
-                applicationPreference = new UserPreference();
-                getUserPreferenceFacade().create(applicationPreference);
-            }
+            loadApplicationPreferances();
         }
-
         return applicationPreference;
     }
 
@@ -1507,6 +1532,63 @@ public class SessionController implements Serializable, HttpSessionListener {
         setApplicationPreference(institutionPreference);
     }
 
-    
-    
+    public boolean isWebsiteUserGoingToLog() {
+        return websiteUserGoingToLog;
+    }
+
+    public void setWebsiteUserGoingToLog(boolean websiteUserGoingToLog) {
+        this.websiteUserGoingToLog = websiteUserGoingToLog;
+    }
+
+    public String getPrimeTheme() {
+        return primeTheme;
+    }
+
+    public void setPrimeTheme(String primeTheme) {
+        this.primeTheme = primeTheme;
+    }
+
+    public UserPreference getDepartmentPreference() {
+        return departmentPreference;
+    }
+
+    public void setDepartmentPreference(UserPreference departmentPreference) {
+        this.departmentPreference = departmentPreference;
+    }
+
+    public Boolean getFirstLogin() {
+        if (firstLogin == null) {
+            firstLogin = isFirstVisit();
+        }
+        return firstLogin;
+    }
+
+    public void setFirstLogin(Boolean firstLogin) {
+        this.firstLogin = firstLogin;
+    }
+
+    public String getInstitutionName() {
+        return institutionName;
+    }
+
+    public void setInstitutionName(String institutionName) {
+        this.institutionName = institutionName;
+    }
+
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
+    }
+
+    public String getAdminName() {
+        return adminName;
+    }
+
+    public void setAdminName(String adminName) {
+        this.adminName = adminName;
+    }
+
 }

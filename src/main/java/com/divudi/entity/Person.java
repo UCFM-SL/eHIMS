@@ -1,8 +1,8 @@
 /*
  * Author : Dr. M H B Ariyaratne
  *
- * MO(Health Information), Department of Health Services, Southern Province
- * and
+ * Acting Consultant (Health Informatics), Department of Health Services, Southern Province
+ * (94) 71 5812399
  * Email : buddhika.ari@gmail.com
  */
 package com.divudi.entity;
@@ -11,6 +11,7 @@ import com.divudi.data.Sex;
 import com.divudi.data.Title;
 import com.divudi.entity.clinical.ClinicalFindingValue;
 import com.divudi.entity.membership.MembershipScheme;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +20,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -35,17 +37,17 @@ import org.joda.time.PeriodType;
 
 /**
  *
- * @author Dr. M. H. B. Ariyaratne, MBBS, PGIM Trainee for MSc(Biomedical
- * Informatics)
+ * @author Dr. M. H. B. Ariyaratne, MBBS, MSc, MD(Health Informatics)
+ * Acting Consultant (Health Informatics)
  */
 @Entity
 @XmlRootElement
 public class Person implements Serializable {
 
-    @OneToOne(mappedBy = "webUserPerson",cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "webUserPerson",cascade = CascadeType.ALL) @JsonIgnore
     private WebUser webUser;
 
-    @OneToMany(mappedBy = "person")
+    @OneToMany(mappedBy = "person",fetch = FetchType.LAZY)
     private List<ClinicalFindingValue> clinicalFindingValues;
 
     static final long serialVersionUID = 1L;
@@ -74,26 +76,26 @@ public class Person implements Serializable {
     Date dob;
 
     //Created Properties
-    @ManyToOne
-    WebUser creater;
+    @ManyToOne @JsonIgnore
+    WebUser creater; @JsonIgnore
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     Date createdAt;
-    @ManyToOne
-    WebUser editer;
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
-    Date editedAt;
+//    @ManyToOne
+//    WebUser editer;
+//    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+//    Date editedAt;
     //Retairing properties
-    boolean retired;
-    @ManyToOne
+     @JsonIgnore boolean retired;
+    @ManyToOne  @JsonIgnore
     WebUser retirer;
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
-    Date retiredAt;
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)  @JsonIgnore
+    Date retiredAt; @JsonIgnore
     String retireComments;
-    @ManyToOne
+    @ManyToOne   @JsonIgnore
     Area area;
-    @ManyToOne
+    @ManyToOne  @JsonIgnore
     Institution institution;
-    @ManyToOne
+    @ManyToOne @JsonIgnore
     Department department;
     @Enumerated(EnumType.STRING)
     Title title;
@@ -103,7 +105,7 @@ public class Person implements Serializable {
     String nameWithTitle;
     boolean foreigner = false;
 
-    @ManyToOne
+    @ManyToOne @JsonIgnore
     private MembershipScheme membershipScheme;
 
     @Transient
@@ -231,21 +233,21 @@ public class Person implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public WebUser getEditer() {
-        return editer;
-    }
-
-    public void setEditer(WebUser editer) {
-        this.editer = editer;
-    }
-
-    public Date getEditedAt() {
-        return editedAt;
-    }
-
-    public void setEditedAt(Date editedAt) {
-        this.editedAt = editedAt;
-    }
+//    public WebUser getEditer() {
+//        return editer;
+//    }
+//
+//    public void setEditer(WebUser editer) {
+//        this.editer = editer;
+//    }
+//
+//    public Date getEditedAt() {
+//        return editedAt;
+//    }
+//
+//    public void setEditedAt(Date editedAt) {
+//        this.editedAt = editedAt;
+//    }
 
     public WebUser getCreater() {
         return creater;

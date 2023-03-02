@@ -1,10 +1,10 @@
 /*
- * MSc(Biomedical Informatics) Project
+ * Open Hospital Management Information System
  * 
- * Development and Implementation of a Web-based Combined Data Repository of 
- Genealogical, Clinical, Laboratory and Genetic Data 
- * and
- * a Set of Related Tools
+ * Dr M H B Ariyaratne 
+ * Acting Consultant (Health Informatics) 
+ * (94) 71 5812399
+ * (94) 71 5812399
  */
 package com.divudi.bean.lab;
 
@@ -14,7 +14,9 @@ import com.divudi.entity.lab.Sample;
 import com.divudi.facade.SampleFacade;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.component.UIComponent;
@@ -26,8 +28,8 @@ import javax.inject.Named;
 
 /**
  *
- * @author Dr. M. H. B. Ariyaratne, MBBS, PGIM Trainee for MSc(Biomedical
- * Informatics)
+ * @author Dr. M. H. B. Ariyaratne, MBBS, MSc, MD(Health Informatics) Acting
+ * Consultant (Health Informatics)
  */
 @Named
 @SessionScoped
@@ -41,7 +43,6 @@ public class SampleController implements Serializable {
     private Sample current;
     private List<Sample> items = null;
     String selectText = "";
-  
 
     public List<Sample> getSelectedItems() {
         selectedItems = getFacade().findBySQL("select c from Sample c where c.retired=false and upper(c.name) like '%" + getSelectText().toUpperCase() + "%' order by c.name");
@@ -132,7 +133,15 @@ public class SampleController implements Serializable {
     }
 
     public List<Sample> getItems() {
-        items = getFacade().findAll("name", true);
+        if (items == null) {
+            String j = "select s "
+                    + " from Sample s "
+                    + " where s.retired=:ret "
+                    + " order by s.name";
+            Map m = new HashMap();
+            m.put("ret", false);
+            items = getFacade().findBySQL(j, m);
+        }
         return items;
     }
 

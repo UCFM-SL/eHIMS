@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Open Hospital Management Information System
+ * Dr M H B Ariyaratne
+ * buddhika.ari@gmail.com
  */
 package com.divudi.bean.hr;
 
@@ -35,7 +35,7 @@ public class StaffGroupController implements Serializable {
     private boolean checkGroup() {
         String sql = "Select s From Staff s where s.retired=false and s.staffGroup is not null "
                 + "and s.staffGroup.roster.retired=false and s.id=" + getCurrentStaff().getId();
-        Staff s = getStaffFacade().findFirstBySQL(sql);
+        Staff s = getStaffFacade().findFirstByJpql(sql);
 
         return s != null;
     }

@@ -1,12 +1,13 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+* Dr M H B Ariyaratne
+ * buddhika.ari@gmail.com
  */
 package com.divudi.entity.lab;
 
 import com.divudi.data.InvestigationReportType;
 import com.divudi.data.SymanticType;
 import com.divudi.entity.Item;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -26,13 +27,17 @@ public class Investigation extends Item implements Serializable {
     static final long serialVersionUID = 1L;
     //Main Properties
     @ManyToOne
+    @JsonIgnore
     InvestigationCategory investigationCategory;
     @ManyToOne
+    @JsonIgnore
     InvestigationTube investigationTube;
     @ManyToOne
+    @JsonIgnore
     Sample sample;
+    @JsonIgnore
     Double SampleVolume;
-    
+
     public InvestigationCategory getInvestigationCategory() {
         return investigationCategory;
     }

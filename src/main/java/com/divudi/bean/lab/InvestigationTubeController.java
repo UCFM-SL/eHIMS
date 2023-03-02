@@ -1,12 +1,13 @@
 /*
- * MSc(Biomedical Informatics) Project
+ * Open Hospital Management Information System
  *
- * Development and Implementation of a Web-based Combined Data Repository of
- Genealogical, Clinical, Laboratory and Genetic Data
- * and
- * a Set of Related Tools
+ * Dr M H B Ariyaratne
+ * Acting Consultant (Health Informatics)
+ * (94) 71 5812399
+ * (94) 71 5812399
  */
 package com.divudi.bean.lab;
+
 import com.divudi.bean.common.SessionController;
 import com.divudi.bean.common.UtilityController;
 import com.divudi.entity.lab.InvestigationTube;
@@ -18,17 +19,19 @@ import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter; import javax.faces.convert.FacesConverter;
+import javax.faces.convert.Converter;
+import javax.faces.convert.FacesConverter;
 import javax.inject.Inject;
 import javax.inject.Named;
+
 /**
  *
- * @author Dr. M. H. B. Ariyaratne, MBBS, PGIM Trainee for MSc(Biomedical
- Informatics)
+ * @author Dr. M. H. B. Ariyaratne, MBBS, MSc, MD(Health Informatics)
+ * Informatics)
  */
 @Named
 @SessionScoped
-public  class InvestigationTubeController implements Serializable {
+public class InvestigationTubeController implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Inject
@@ -129,9 +132,10 @@ public  class InvestigationTubeController implements Serializable {
     }
 
     public List<InvestigationTube> getItems() {
-
-        items = getFacade().findAll();
-
+        if (items == null) {
+            //TODO
+            items = getFacade().findAll();
+        }
         return items;
     }
 

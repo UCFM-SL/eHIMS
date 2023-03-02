@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Open Hospital Management Information System
+ * Dr M H B Ariyaratne
+ * buddhika.ari@gmail.com
  */
 package com.divudi.ws.inward;
 
@@ -471,7 +471,7 @@ public class ApiInward {
         HashMap m = new HashMap();
         sql = "SELECT i FROM Institution i where i.retired=false "
                 + " and i.id=" + id;
-        Institution bank = getInstitutionFacade().findFirstBySQL(sql);
+        Institution bank = getInstitutionFacade().findFirstByJpql(sql);
 //        //// // System.out.println("bank = " + bank);
         return bank;
     }

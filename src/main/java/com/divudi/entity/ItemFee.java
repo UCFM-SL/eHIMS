@@ -1,6 +1,6 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+* Dr M H B Ariyaratne
+ * buddhika.ari@gmail.com
  */
 package com.divudi.entity;
 
@@ -17,5 +17,5 @@ import javax.persistence.InheritanceType;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class ItemFee extends Fee implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+
 }

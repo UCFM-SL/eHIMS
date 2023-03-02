@@ -1,10 +1,10 @@
 /*
- * MSc(Biomedical Informatics) Project
+ * Open Hospital Management Information System
  *
- * Development and Implementation of a Web-based Combined Data Repository of
- Genealogical, Clinical, Laboratory and Genetic Data
- * and
- * a Set of Related Tools
+ * Dr M H B Ariyaratne
+ * Acting Consultant (Health Informatics)
+ * (94) 71 5812399
+ * (94) 71 5812399
  */
 package com.divudi.bean.lab;
 
@@ -61,8 +61,8 @@ import org.primefaces.event.TabChangeEvent;
 
 /**
  *
- * @author Dr. M. H. B. Ariyaratne, MBBS, PGIM Trainee for MSc(Biomedical
- * Informatics)
+ * @author Dr. M. H. B. Ariyaratne, MBBS, MSc, MD(Health Informatics)
+ * Acting Consultant (Health Informatics)
  */
 @Named
 @SessionScoped
@@ -584,7 +584,7 @@ public class LabBillCollectingController implements Serializable {
                             dis = 0.0;
                             bf.getBillItem().setDiscount(0.0);
                         } else {
-                            //    bf.setFeeValue(bf.getFee().getFee() / 100 * (100 - getPaymentScheme().getDiscountPercent()));
+                            //    bf.setFeeValueBoolean(bf.getFee().getFee() / 100 * (100 - getPaymentScheme().getDiscountPercent()));
                             //     dis += (bf.getFee().getFee() / 100 * (getPaymentScheme().getDiscountPercent()));
                             //              bf.getBillItem().setDiscount(bf.getBillItem().getDiscount() + bf.getFee().getFee() / 100 * (getPaymentScheme().getDiscountPercent()));
                         }

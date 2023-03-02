@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Open Hospital Management Information System
+ * Dr M H B Ariyaratne
+ * buddhika.ari@gmail.com
  */
 package com.divudi.ws.channel;
 
@@ -714,7 +714,7 @@ public class Api {
                 if (bs.getBill().getPaymentMethod() == PaymentMethod.Staff) {
                     jSONObject.put("staff_agent_status", bs.getBill().getToStaff().getCode());
                 } else if (bs.getBill().getPaymentMethod() == PaymentMethod.Agent) {
-                    jSONObject.put("staff_agent_status", bs.getBill().getCreditCompany().getInstitutionCode());
+                    jSONObject.put("staff_agent_status", bs.getBill().getCreditCompany().getCode());
                 } else {
                     jSONObject.put("staff_agent_status", "");
                 }
@@ -1592,7 +1592,7 @@ public class Api {
     }
 
     private String generateBillNumberInsId(Bill bill, ServiceSession ss) {
-        String suffix = ss.getInstitution().getInstitutionCode();
+        String suffix = ss.getInstitution().getCode();
         BillClassType billClassType = null;
         BillType[] billTypes = {BillType.ChannelAgent, BillType.ChannelCash, BillType.ChannelOnCall, BillType.ChannelStaff};
         List<BillType> bts = Arrays.asList(billTypes);
@@ -1604,25 +1604,25 @@ public class Api {
             if (bill.getBillType() == BillType.ChannelOnCall || bill.getBillType() == BillType.ChannelStaff) {
                 billType = bill.getBillType();
                 if (billType == BillType.ChannelOnCall) {
-                    suffix += "BKONCALL";
+                    suffix += "COS";
                 } else {
-                    suffix += "BKSTAFF";
+                    suffix += "CS";
                 }
                 insId = getBillNumberBean().institutionBillNumberGenerator(ss.getInstitution(), billType, billClassType, suffix);
             } else {
-                suffix += "CHANN";
+                suffix += "C";
                 insId = getBillNumberBean().institutionBillNumberGenerator(ss.getInstitution(), bts, billClassType, suffix);
             }
         }
 
         if (bill instanceof CancelledBill) {
-            suffix += "CHANNCAN";
+            suffix += "CC";
             billClassType = BillClassType.CancelledBill;
             insId = getBillNumberBean().institutionBillNumberGenerator(ss.getInstitution(), bts, billClassType, suffix);
         }
 
         if (bill instanceof RefundBill) {
-            suffix += "CHANNREF";
+            suffix += "CF";
             billClassType = BillClassType.RefundBill;
             insId = getBillNumberBean().institutionBillNumberGenerator(ss.getInstitution(), bts, billClassType, suffix);
         }
@@ -1633,7 +1633,7 @@ public class Api {
     }
 
     private String generateBillNumberDeptId(Bill bill, ServiceSession ss) {
-        String suffix = ss.getDepartment().getDepartmentCode();
+        String suffix = ss.getDepartment().getCode();
         BillClassType billClassType = null;
         BillType[] billTypes = {BillType.ChannelAgent, BillType.ChannelCash, BillType.ChannelOnCall, BillType.ChannelStaff};
         List<BillType> bts = Arrays.asList(billTypes);
@@ -1645,25 +1645,25 @@ public class Api {
             if (bill.getBillType() == BillType.ChannelOnCall || bill.getBillType() == BillType.ChannelStaff) {
                 billType = bill.getBillType();
                 if (billType == BillType.ChannelOnCall) {
-                    suffix += "BKONCALL";
+                    suffix += "COS";
                 } else {
-                    suffix += "BKSTAFF";
+                    suffix += "CS";
                 }
                 deptId = getBillNumberBean().departmentBillNumberGenerator(ss.getInstitution(), ss.getDepartment(), billType, billClassType, suffix);
             } else {
-                suffix += "CHANN";
+                suffix += "C";
                 deptId = getBillNumberBean().departmentBillNumberGenerator(ss.getInstitution(), ss.getDepartment(), bts, billClassType, suffix);
             }
         }
 
         if (bill instanceof CancelledBill) {
-            suffix += "CHANNCAN";
+            suffix += "CC";
             billClassType = BillClassType.CancelledBill;
             deptId = getBillNumberBean().departmentBillNumberGenerator(ss.getInstitution(), ss.getDepartment(), bts, billClassType, suffix);
         }
 
         if (bill instanceof RefundBill) {
-            suffix += "CHANNREF";
+            suffix += "CF";
             billClassType = BillClassType.RefundBill;
             deptId = getBillNumberBean().departmentBillNumberGenerator(ss.getInstitution(), ss.getDepartment(), bts, billClassType, suffix);
         }

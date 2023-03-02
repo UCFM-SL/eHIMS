@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Open Hospital Management Information System
+ * Dr M H B Ariyaratne
+ * buddhika.ari@gmail.com
  */
 package com.divudi.bean.common;
 
@@ -635,7 +635,7 @@ public class OpdPreSettleController implements Serializable {
                 for (BillItem bi : b.getBillItems()) {
 
                     String sql = "SELECT bi FROM BillItem bi where bi.retired=false and bi.referanceBillItem.id=" + bi.getId();
-                    BillItem rbi = getBillItemFacade().findFirstBySQL(sql);
+                    BillItem rbi = getBillItemFacade().findFirstByJpql(sql);
 
                     if (rbi != null) {
                         UtilityController.addErrorMessage("Some Bill Item Already Refunded");

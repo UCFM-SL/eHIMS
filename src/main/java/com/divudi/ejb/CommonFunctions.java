@@ -2,19 +2,24 @@ package com.divudi.ejb;
 
 import com.divudi.data.dataStructure.DateRange;
 import com.divudi.data.dataStructure.YearMonthDay;
+import com.divudi.entity.Bill;
+import com.divudi.entity.Patient;
+import com.divudi.entity.PatientEncounter;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 import javax.ejb.Singleton;
-import org.joda.time.Days;
 import org.joda.time.LocalDate;
-import org.joda.time.Months;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
-import org.joda.time.Years;
 
 /**
  *
@@ -61,7 +66,139 @@ public class CommonFunctions {
         //System.err.println("To " + dateRange.getToDate());
         return dateRange;
     }
-    
+
+    public static Map<String, String> getReplaceables(Bill b) {
+        Map<String, String> m = new HashMap<>();
+        if (b == null) {
+            return m;
+        }
+
+        if (b.getInsId() != null) {
+            m.put("{ins_id}", b.getInsId());
+        }
+
+        if (b.getDeptId() != null) {
+            m.put("{dept_id}", b.getDeptId());
+        }
+
+        if (b.getId() != null) {
+            m.put("{id}", b.getId() + "");
+        }
+
+        if (b.getDepartment() != null) {
+            m.put("{department}", b.getDepartment().getName());
+        }
+
+        if (b.getInstitution() != null) {
+            m.put("{institution}", b.getInstitution().getName());
+        }
+
+        if (b.getFromDepartment() != null) {
+            m.put("{from_department}", b.getFromDepartment().getName());
+        }
+
+        if (b.getFromInstitution() != null) {
+            m.put("{from_institution}", b.getFromInstitution().getName());
+        }
+
+        if (b.getToDepartment() != null) {
+            m.put("{to_department}", b.getToDepartment().getName());
+        }
+
+        if (b.getToInstitution() != null) {
+            m.put("{to_institution}", b.getToInstitution().getName());
+        }
+        DecimalFormat df = new DecimalFormat("0.00");
+
+        m.put("{grand_total}", df.format(b.getGrantTotal()));
+        m.put("{net_total}", df.format(b.getNetTotal()));
+        m.put("{discount}", df.format(b.getDiscount()));
+        m.put("{balance}", df.format(b.getBalance()));
+        m.put("{paid}", df.format(b.getPaidAmount()));
+
+        if (b.getBillDate() != null) {
+            m.put("{date}", CommonFunctions.formatDate(b.getBillDate(), "dd/MMMM/yyyy"));
+        }
+
+        if (b.getBillTime() != null) {
+            m.put("{time}", CommonFunctions.formatDate(b.getBillTime(), "hh:mm a"));
+        }
+
+        if (b.getCreater() != null) {
+            m.put("{user}", b.getCreater().getName());
+        }
+
+        if (b.getPatientEncounter() != null) {
+            Map<String, String> me = getReplaceables(b.getPatientEncounter());
+            me.forEach(m::putIfAbsent);
+        } else if (b.getPatient() != null) {
+            Map<String, String> mp = getReplaceables(b.getPatient());
+            mp.forEach(m::putIfAbsent);
+        }
+        return m;
+    }
+
+    public static Map<String, String> getReplaceables(Patient p) {
+        Map<String, String> m = new HashMap<>();
+        if (p == null) {
+            return m;
+        }
+        m.put("{age}", p.getAge());
+        m.put("{phn}", p.getPhn());
+        if (p.getPerson() != null) {
+            m.put("{name}", p.getPerson().getName());
+            m.put("{sex}", p.getPerson().getSex().toString());
+            m.put("{phone}", p.getPerson().getPhone());
+            m.put("{address}", p.getPerson().getAddress());
+            
+        }
+        return m;
+    }
+
+    public static Map<String, String> getReplaceables(PatientEncounter e) {
+        Map<String, String> m = new HashMap<>();
+        if (e == null) {
+            return m;
+        }
+        if(e.getBhtNo()!=null){
+            m.put("{bht}", e.getBhtNo());
+        }
+        if(e.getBhtNo()!=null){
+            m.put("{bht}", e.getBhtNo());
+        }
+        if(e.getDateOfAdmission()!=null){
+            m.put("{date_of_admission}", CommonFunctions.formatDate(e.getDateOfAdmission(), "dd/MMMM/yyyy"));
+        }
+        if(e.getDateOfDischarge()!=null){
+            m.put("{date_of_discharge}", CommonFunctions.formatDate(e.getDateOfDischarge(), "dd/MMMM/yyyy"));
+        }
+        if(e.getBhtNo()!=null){
+            m.put("{bht}", e.getBhtNo());
+        }
+        if(e.getOpdDoctor()!=null){
+            m.put("{opd_doctor}", e.getOpdDoctor().getPerson().getNameWithTitle());
+        }
+        if(e.getReferringDoctor()!=null){
+            m.put("{referring_doctor}", e.getReferringDoctor().getPerson().getNameWithTitle());
+        }
+        if (e.getPatient() != null) {
+            Map<String, String> p = getReplaceables(e.getPatient());
+            p.forEach(m::putIfAbsent);
+        }
+        return m;
+    }
+
+    public static String replaceText(Map<String, String> m, String template) {
+        String output = template;
+        if (m == null || m.isEmpty()) {
+            return output;
+        }
+        for (Map.Entry<String, String> entry : m.entrySet()) {
+            output = output.replaceAll(entry.getKey(), entry.getValue());
+        }
+        return output;
+    }
+
     public static String formatDate(Date date, String pattern) {
         String dateString = "";
         if (date == null) {
@@ -70,8 +207,12 @@ public class CommonFunctions {
         if (pattern == null || pattern.trim().equals("")) {
             pattern = "dd-MM-yyyy";
         }
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-        dateString = simpleDateFormat.format(date);
+        try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+            dateString = simpleDateFormat.format(date);
+        } catch (Exception e) {
+            dateString = "";
+        }
         return dateString;
     }
 
@@ -88,7 +229,6 @@ public class CommonFunctions {
         }
         return date;
     }
-
 
     public boolean checkToDateAreInSameDay(Date firstDate, Date secondDate) {
 
@@ -290,6 +430,12 @@ public class CommonFunctions {
         return calendar.getTime();
     }
 
+    public static LocalDateTime getLocalDateTime(Date dateTime) {
+        Date input = dateTime;
+        LocalDateTime date = input.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        return date;
+    }
+
     public static Date getStartOfMonth() {
         return getStartOfMonth(new Date());
     }
@@ -425,7 +571,7 @@ public class CommonFunctions {
 //        //////// // System.out.println("... in milliseconds:      " + cal.getTimeInMillis());
         return cal.getTime();
     }
-    
+
     public static Date getStartOfBeforeDay(Date date) {
         if (date == null) {
             date = new Date();
@@ -464,8 +610,8 @@ public class CommonFunctions {
     }
 
     public YearMonthDay guessAge(Date dofb) {
-        YearMonthDay yearMonthDay=new YearMonthDay();
-        
+        YearMonthDay yearMonthDay = new YearMonthDay();
+
 //        Calendar cal=Calendar.getInstance();
 //        cal.setTime(dob);
 //        //// // System.out.println("cal.get(Calendar.YEAR) = " + cal.get(Calendar.YEAR));
@@ -473,7 +619,6 @@ public class CommonFunctions {
 //        //// // System.out.println("cal.get(Calendar.DATE) = " + cal.get(Calendar.DATE));
 //        LocalDate birthDay=new LocalDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH)+1, cal.get(Calendar.DATE));
 //        LocalDate now=new LocalDate();
-        
         LocalDate dob = new LocalDate(dofb);
         LocalDate date = new LocalDate(new Date());
 
@@ -481,7 +626,7 @@ public class CommonFunctions {
         int ageYears = period.getYears();
         int ageMonths = period.getMonths();
         int ageDays = period.getDays();
-        
+
 //        Years years=Years.yearsBetween(birthDay, now);
 //        Months months=Months.monthsBetween(birthDay, now);
 //        Days days=Days.daysBetween(birthDay, now);
@@ -491,7 +636,7 @@ public class CommonFunctions {
         yearMonthDay.setMonth(Integer.toString(ageMonths));
 //        //// // System.out.println("days.getDays() = " + days.getDays());
         yearMonthDay.setDay(Integer.toString(ageDays));
-        
+
         return yearMonthDay;
     }
 

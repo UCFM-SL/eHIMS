@@ -1,18 +1,18 @@
 /*
- * MSc(Biomedical Informatics) Project
+ * Open Hospital Management Information System
  *
- * Development and Implementation of a Web-based Combined Data Repository of
- Genealogical, Clinical, Laboratory and Genetic Data
- * and
- * a Set of Related Tools
+ * Dr M H B Ariyaratne
+ * Acting Consultant (Health Informatics)
+ * (94) 71 5812399
+ * (94) 71 5812399
  */
 package com.divudi.bean.common;
 
 import com.divudi.data.DepartmentType;
-import com.divudi.data.InstitutionType;
 import com.divudi.entity.Department;
 import com.divudi.entity.Institution;
 import com.divudi.facade.DepartmentFacade;
+import com.divudi.facade.util.JsfUtil;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,8 +31,8 @@ import javax.persistence.TemporalType;
 
 /**
  *
- * @author Dr. M. H. B. Ariyaratne, MBBS, PGIM Trainee for MSc(Biomedical
- * Informatics)
+ * @author Dr. M. H. B. Ariyaratne, MBBS, MSc, MD(Health Informatics) Acting
+ * Consultant (Health Informatics)
  */
 @Named
 @SessionScoped
@@ -52,6 +52,53 @@ public class DepartmentController implements Serializable {
     private Institution institution;
 
     List<Department> itemsToRemove;
+
+    public void fillItems() {
+        String j;
+        j = "select i from Department i where i.retired=false order by i.name";
+        items = getFacade().findBySQL(j);
+    }
+
+    public String toListDepartments() {
+        fillItems();
+        return "/admin/departments";
+    }
+
+    public String toAddNewDepartment() {
+        current = new Department();
+        return "/admin/department";
+    }
+
+    public String toEditDepartment() {
+        if (current == null) {
+            JsfUtil.addErrorMessage("Nothing selected");
+            return "";
+        }
+        return "/admin/department";
+    }
+
+    public String deleteDepartment() {
+        if (current == null) {
+            JsfUtil.addErrorMessage("Nothing selected");
+            return "";
+        }
+        current.setRetired(true);
+        getFacade().edit(current);
+        return toListDepartments();
+    }
+
+    public String saveSelectedDepartment() {
+        if (current == null) {
+            JsfUtil.addErrorMessage("Nothing selected");
+            return "";
+        }
+        if (current.getId() == null) {
+            getFacade().create(current);
+        } else {
+            getFacade().edit(current);
+        }
+        return toListDepartments();
+    }
 
     public List<Department> getSearchItems() {
         return searchItems;
@@ -106,7 +153,6 @@ public class DepartmentController implements Serializable {
         }
         return items;
     }
-
 
     public List<Department> listAllDepatrments() {
         List<Department> departments;
@@ -260,24 +306,6 @@ public class DepartmentController implements Serializable {
         items = null;
     }
 
-    private Boolean checkCodeExist() {
-        String sql = "SELECT i FROM Department i where i.retired=false "
-                + " and i.departmentCode is not null ";
-        List<Department> ins = getEjbFacade().findBySQL(sql);
-        if (ins != null) {
-            for (Department i : ins) {
-                if (i.getDepartmentCode().trim().equals("")) {
-                    continue;
-                }
-                if (i.getDepartmentCode() != null && i.getDepartmentCode().equals(getCurrent().getDepartmentCode())) {
-                    UtilityController.addErrorMessage("Insituion Code Already Exist Try another Code");
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     public void saveSelected() {
         if (getCurrent() == null || getCurrent().getName().trim().equals("")) {
             UtilityController.addErrorMessage("Please enter a name");
@@ -288,20 +316,9 @@ public class DepartmentController implements Serializable {
             return;
         }
         if (getCurrent().getId() != null && getCurrent().getId() > 0) {
-            if (getCurrent().getDepartmentCode() != null) {
-                getCurrent().setDepartmentCode(getCurrent().getDepartmentCode());
-            }
             getFacade().edit(getCurrent());
             UtilityController.addSuccessMessage("Updated");
         } else {
-            if (getCurrent().getDepartmentCode() != null) {
-                if (!checkCodeExist()) {
-                    getCurrent().setDepartmentCode(getCurrent().getDepartmentCode());
-
-                } else {
-                    return;
-                }
-            }
             getCurrent().setCreatedAt(new Date());
             getCurrent().setCreater(getSessionController().getLoggedUser());
             getFacade().create(getCurrent());
@@ -447,7 +464,6 @@ public class DepartmentController implements Serializable {
     }
 
     public List<Department> getItems() {
-        items = getFacade().findAll("name", true);
         return items;
     }
 
@@ -465,6 +481,17 @@ public class DepartmentController implements Serializable {
 
     public void setInstitution(Institution institution) {
         this.institution = institution;
+    }
+
+    public void save(Department dep) {
+        if (dep == null) {
+            return;
+        }
+        if(dep.getId()==null){
+             getFacade().create(dep);
+        }else{
+            getFacade().edit(dep);
+        }
     }
 
     /**

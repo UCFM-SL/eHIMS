@@ -1,10 +1,10 @@
 /*
- * MSc(Biomedical Informatics) Project
+ * Open Hospital Management Information System
  *
- * Development and Implementation of a Web-based Combined Data Repository of
- Genealogical, Clinical, Laboratory and Genetic Data
- * and
- * a Set of Related Tools
+ * Dr M H B Ariyaratne
+ * Acting Consultant (Health Informatics)
+ * (94) 71 5812399
+ * (94) 71 5812399
  */
 package com.divudi.bean.collectingCentre;
 
@@ -83,8 +83,8 @@ import org.primefaces.event.TabChangeEvent;
 
 /**
  *
- * @author Dr. M. H. B. Ariyaratne, MBBS, PGIM Trainee for MSc(Biomedical
- * Informatics)
+ * @author Dr. M. H. B. Ariyaratne, MBBS, MSc, MD(Health Informatics)
+ * Acting Consultant (Health Informatics)
  */
 @Named
 @SessionScoped
@@ -420,7 +420,7 @@ public class CollectingCentreBillController implements Serializable {
 //    }
     public boolean findByFilter(String property, String value) {
         String sql = "Select b From Bill b where b.retired=false and upper(b." + property + ") like '%" + value.toUpperCase() + " %'";
-        Bill b = getBillFacade().findFirstBySQL(sql);
+        Bill b = getBillFacade().findFirstByJpql(sql);
         //System.err.println("SQL " + sql);
         //System.err.println("Bill " + b);
         if (b != null) {

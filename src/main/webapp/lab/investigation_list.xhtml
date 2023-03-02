@@ -6,14 +6,14 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:p="http://primefaces.org/ui"
-                xmlns:poue="http://primefaces.org/ui/extensions">
+                >
 
 
     <ui:define name="content">
 
         <h:panelGroup >
             <h:form id="form"  >
-                <p:growl autoUpdate="true" />
+                <p:growl  />
                 <p:panel id="panIx"  >
 
                     <f:facet name="header" >
@@ -25,12 +25,20 @@
                         <p:commandButton id="excel" ajax="false" value="Excel"  >
                             <p:dataExporter target="tbl" type="csv" fileName="List of All Investigations"  />
                         </p:commandButton>
+                        <p:commandButton value="Download as JSON" ajax="false"  icon="ui-icon-arrowthick-1-s">
+                            <p:fileDownload value="#{investigationItemController.ixToJsonFile}" />
+                        </p:commandButton>
                     </f:facet>
-                    <p:dataTable id="tbl" rowIndexVar="rowIndex" value="#{investigationController.allIxs}" var="ix" 
+                    <p:dataTable id="tbl" 
+                                 rowIndexVar="rowIndex" 
+                                 value="#{investigationController.allIxs}" 
+                                 var="ix" 
+                                 
                                  rows="20"
                                  paginator="true"
                                  paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                  rowsPerPageTemplate="20, 50, 100" 
+                                 
                                  >
                         <p:column headerText="No." width="30">
                             <h:outputLabel value="#{rowIndex + 1}" ></h:outputLabel>

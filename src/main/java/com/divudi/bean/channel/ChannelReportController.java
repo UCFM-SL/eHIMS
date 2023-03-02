@@ -1,6 +1,6 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Dr M H B Ariyaratne
+ * buddhika.ari@gmail.com
  */
 package com.divudi.bean.channel;
 
@@ -1083,6 +1083,33 @@ public class ChannelReportController implements Serializable {
         totalRefundDoc = calTotalDoc(refundBills);
         netTotal = totalBilled + totalCancel + totalRefund;
         netTotalDoc = totalBilledDoc + totalCancelDoc + totalRefundDoc;
+
+        commonController.printReportDetails(fromDate, toDate, startTime, "Channeling/Reports/Income report/Bill report/Bill detail summery(/faces/channel/channel_report_by_bill_class.xhtml)");
+
+    }
+
+    public void channelAllBillList() {
+        Date startTime = new Date();
+
+        BillType[] billTypes = {BillType.ChannelAgent, BillType.ChannelCash, BillType.ChannelOnCall, BillType.ChannelStaff};
+        List<BillType> bts = Arrays.asList(billTypes);
+        HashMap hm = new HashMap();
+
+        String sql = " select b from Bill b "
+                + " where b.retired=false "
+                + " and type(b)=:class ";
+
+        sql += " and b.createdAt between :fd and :td ";
+
+        sql += " and b.billType in :bts ";
+        hm.put("bts", bts);
+
+        sql += " order by b.id ";
+
+        hm.put("class", BilledBill.class);
+        hm.put("fd", getFromDate());
+        hm.put("td", getToDate());
+        billedBills = billFacade.findBySQL(sql, hm, TemporalType.TIMESTAMP);
 
         commonController.printReportDetails(fromDate, toDate, startTime, "Channeling/Reports/Income report/Bill report/Bill detail summery(/faces/channel/channel_report_by_bill_class.xhtml)");
 
@@ -2458,7 +2485,6 @@ public class ChannelReportController implements Serializable {
                 }
 
                 //// // System.out.println("cashCount = " + cashCount);
-
                 dpsrs.setCashCount(cashCount);
                 dpsrs.setAgentCount(agentCount);
                 dpsrs.setOnCallCount(onCallCount);
@@ -2529,14 +2555,12 @@ public class ChannelReportController implements Serializable {
                     }
                 }
 
-
                 doctorPaymentSummeryRowSub.setCashCount(cashCount);
                 doctorPaymentSummeryRowSub.setAgentCount(agentCount);
                 doctorPaymentSummeryRowSub.setOnCallCount(onCallCount);
                 doctorPaymentSummeryRowSub.setStaffCount(staffCount);
 
             }
-
 
             Calendar nc = Calendar.getInstance();
             nc.setTime(nowDate);
@@ -2622,7 +2646,6 @@ public class ChannelReportController implements Serializable {
         Date fd = commonFunctions.getStartOfDay(d);
         Date td = commonFunctions.getEndOfDay(d);
 
-
         String sql = "SELECT distinct(bf.bill) FROM BillFee bf "
                 + " WHERE bf.retired = false "
                 + " and bf.bill.cancelled=false "
@@ -2698,14 +2721,12 @@ public class ChannelReportController implements Serializable {
                         }
                     }
 
-
                     doctorPaymentSummeryRowSub.setCashCount(cashCount);
                     doctorPaymentSummeryRowSub.setAgentCount(agentCount);
                     doctorPaymentSummeryRowSub.setOnCallCount(onCallCount);
                     doctorPaymentSummeryRowSub.setStaffCount(staffCount);
 
                 }
-
 
                 Calendar nc = Calendar.getInstance();
                 nc.setTime(nowDate);
@@ -2774,7 +2795,6 @@ public class ChannelReportController implements Serializable {
 
         Date fd = new Date();
         Date td = new Date();
-
 
 //        String sql = "select bf from BillFee bf "
 //                + " where bf.bill.retired=false "
@@ -2854,7 +2874,6 @@ public class ChannelReportController implements Serializable {
 
         Date fd = commonFunctions.getStartOfDay(d);
         Date td = commonFunctions.getEndOfDay(d);
-
 
         String sql = "SELECT count(bi.paidForBillFee.bill) FROM BillItem bi "
                 + " WHERE bi.retired = false "
@@ -3079,11 +3098,6 @@ public class ChannelReportController implements Serializable {
         if (bill != null) {
             sql += " and type(b)=:class";
             hm.put("class", bill.getClass());
-        }
-
-        if (reportKeyWord.getWebUser() != null) {
-            sql += " and b.creater=:user";
-            hm.put("user", reportKeyWord.getWebUser());
         }
 
         sql += " order by b.createdAt ";
@@ -4472,7 +4486,7 @@ public class ChannelReportController implements Serializable {
 
                     if ((b.getBillType() == BillType.ChannelPaid && b.getReferenceBill() == null && b instanceof BilledBill)
                             || (b.getBillType() == BillType.ChannelCredit && b instanceof BilledBill)) {
-                        BillSession bs = getBillSessionFacade().findFirstBySQL("select b from BillSession b where b.retired=false and b.bill.id=" + b.getId());
+                        BillSession bs = getBillSessionFacade().findFirstByJpql("select b from BillSession b where b.retired=false and b.bill.id=" + b.getId());
                         if (bs.isAbsent()) {
                             cd.setAbsentCount(cd.getAbsentCount() + 1);
                         }
@@ -4557,7 +4571,7 @@ public class ChannelReportController implements Serializable {
 
                     if ((b.getBillType() == BillType.ChannelPaid && b.getReferenceBill() == null && b instanceof BilledBill)
                             || (b.getBillType() == BillType.ChannelCredit && b instanceof BilledBill)) {
-                        BillSession bs = getBillSessionFacade().findFirstBySQL("select b from BillSession b where b.retired=false and b.bill.id=" + b.getId());
+                        BillSession bs = getBillSessionFacade().findFirstByJpql("select b from BillSession b where b.retired=false and b.bill.id=" + b.getId());
                         if (bs.isAbsent()) {
                             cd.setAbsentCount(cd.getAbsentCount() + 1);
                         }
@@ -5383,7 +5397,6 @@ public class ChannelReportController implements Serializable {
 
         sql += " order by ah.createdAt ";
 
-
         return getAgentHistoryFacade().findBySQL(sql, m, TemporalType.TIMESTAMP);
 
     }
@@ -5413,7 +5426,6 @@ public class ChannelReportController implements Serializable {
         m.put("td", td);
 
         sql += " order by ah.bill.fromInstitution.name ,ah.createdAt ";
-
 
         return getAgentHistoryFacade().findBySQL(sql, m, TemporalType.TIMESTAMP);
 
@@ -5452,7 +5464,6 @@ public class ChannelReportController implements Serializable {
 
         ahs = getAgentHistoryFacade().findBySQL(sql, m, TemporalType.TIMESTAMP);
 
-
         return ahs;
 
     }
@@ -5484,7 +5495,6 @@ public class ChannelReportController implements Serializable {
 
         sql += " order by ah.bill.billClassType, ah.createdAt ";
         d = getAgentHistoryFacade().findDoubleByJpql(sql, m);
-
 
         return d;
 

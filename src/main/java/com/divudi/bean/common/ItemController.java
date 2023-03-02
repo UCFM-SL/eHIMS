@@ -3,7 +3,6 @@ package com.divudi.bean.common;
 import com.divudi.data.DepartmentType;
 import com.divudi.data.FeeType;
 import com.divudi.data.ItemType;
-import com.divudi.data.SymanticType;
 import com.divudi.data.hr.ReportKeyWord;
 import com.divudi.entity.BillExpense;
 import com.divudi.entity.Category;
@@ -47,12 +46,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.TemporalType;
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang3.ClassUtils;
 
 /**
  *
- * @author Dr. M. H. B. Ariyaratne, MBBS, PGIM Trainee for MSc(Biomedical
- * Informatics)
+ * @author Dr. M. H. B. Ariyaratne, MBBS, MSc, MD(Health Informatics)
+ * Acting Consultant (Health Informatics)
  */
 @Named
 @SessionScoped
@@ -103,6 +101,60 @@ public class ItemController implements Serializable {
     private List<Item> investigationSampleComponents;
 
     ReportKeyWord reportKeyWord;
+    
+    public void fillInvestigations() {
+        String j;
+        j = "select i from Investigation i where i.retired=false order by i.name";
+        items = getFacade().findBySQL(j);
+    }
+    
+    public String toManageItemdIndex(){
+        return "/admin/admin_items_index";
+    }
+    
+    public String toListInvestigations() {
+        fillInvestigations();
+        return "/admin/investigations";
+    }
+
+    public String toAddNewInvestigation() {
+        current = new Investigation();
+        return "/admin/investigation";
+    }
+
+    public String toEditInvestigation() {
+        if (current == null) {
+            JsfUtil.addErrorMessage("Nothing selected");
+            return "";
+        }
+        return "/admin/institution";
+    }
+
+    public String deleteInvestigation() {
+        if (current == null) {
+            JsfUtil.addErrorMessage("Nothing selected");
+            return "";
+        }
+        current.setRetired(true);
+        getFacade().edit(current);
+        return toListInvestigations();
+    }
+    
+    public String saveSelectedInvestigation(){
+         if (current == null) {
+            JsfUtil.addErrorMessage("Nothing selected");
+            return "";
+        }
+         if(current.getId()==null){
+             getFacade().create(current);
+         }else{
+             getFacade().edit(current);
+         }
+         return toListInvestigations();
+    }
+    
+    
+    
 
     public void fillInvestigationSampleComponents() {
         if (current == null) {
@@ -293,7 +345,7 @@ public class ItemController implements Serializable {
             return;
         }
         current.setMachine(machine);
-        current.setInstitution(machine.getInstitution());
+//        current.setInstitution(machine.getInstitution());
         current.setItemType(ItemType.AnalyzerTest);
 
         if (current.getId() == null) {

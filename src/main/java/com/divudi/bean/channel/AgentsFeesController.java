@@ -1,10 +1,10 @@
 /*
- * MSc(Biomedical Informatics) Project
+ * Open Hospital Management Information System
  *
- * Development and Implementation of a Web-based Combined Data Repository of
+ * Dr M H B Ariyaratne
  Genealogical, Clinical, agentsFeesoratory and Genetic Data
- * and
- * a Set of Related Tools
+ * (94) 71 5812399
+ * (94) 71 5812399
  */
 package com.divudi.bean.channel;
 
@@ -32,7 +32,7 @@ import javax.inject.Named;
 
 /**
  *
- * @author Dr. M. H. B. Ariyaratne, MBBS, PGIM Trainee for MSc(Biomedical
+ * @author Dr. M. H. B. Ariyaratne, MBBS, MSc, MD(Health Informatics)
  Informatics)
  */
 @Named
@@ -77,7 +77,7 @@ public class AgentsFeesController implements Serializable {
     public void saveSelected() {
         if (getCurrent().getServiceSession() != null) {
 
-            AgentsFees tp = getEjbFacade().findFirstBySQL("select s from AgentsFees s where s.serviceSession.id=" + getCurrent().getServiceSession().getId()
+            AgentsFees tp = getEjbFacade().findFirstByJpql("select s from AgentsFees s where s.serviceSession.id=" + getCurrent().getServiceSession().getId()
                     + " and s.agent.id=" + getAgent().getId());
 
             if (tp != null) {

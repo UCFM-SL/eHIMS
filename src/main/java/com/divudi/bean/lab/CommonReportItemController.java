@@ -1,10 +1,10 @@
 /*
- * MSc(Biomedical Informatics) Project
+ * Open Hospital Management Information System
  *
- * Development and Implementation of a Web-based Combined Data Repository of
- Genealogical, Clinical, Laboratory and Genetic Data
- * and
- * a Set of Related Tools
+ * Dr M H B Ariyaratne
+ * Acting Consultant (Health Informatics)
+ * (94) 71 5812399
+ * (94) 71 5812399
  */
 package com.divudi.bean.lab;
 
@@ -36,8 +36,8 @@ import javax.inject.Named;
 
 /**
  *
- * @author Dr. M. H. B. Ariyaratne, MBBS, PGIM Trainee for MSc(Biomedical
- * Informatics)
+ * @author Dr. M. H. B. Ariyaratne, MBBS, MSc, MD(Health Informatics)
+ * Acting Consultant (Health Informatics)
  */
 @Named
 @SessionScoped
@@ -90,7 +90,7 @@ public class CommonReportItemController implements Serializable {
 
     public CommonReportItem getLastCommonReportItem() {
         String j = "select i from CommonReportItem i order by i.id desc";
-        return getEjbFacade().findFirstBySQL(j);
+        return getEjbFacade().findFirstByJpql(j);
     }
 
     public void addNewCombo() {
@@ -245,9 +245,9 @@ public class CommonReportItemController implements Serializable {
         }
         List<CommonReportItem> ris = getItems();
         ReportFormat c = new ReportFormat();
-        c.setName(category.getName() + "1");
-        c.settName(category.gettName() + "1");
-        c.setsName(category.getsName() + "1");
+        c.setName(category.getName() + "_1");
+        c.setCode(category.getCode()+ "_1");
+        c.setDescription(category.getDescription() + "_1");
         c.setCreatedAt(new Date());
         c.setCreater(sessionController.getLoggedUser());
         getCategoryFacade().create(c);

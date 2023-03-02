@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Open Hospital Management Information System
+ * Dr M H B Ariyaratne
+ * buddhika.ari@gmail.com
  */
 package com.divudi.bean.inward;
 
@@ -22,7 +22,6 @@ import com.divudi.entity.PatientEncounter;
 import com.divudi.entity.PatientItem;
 import com.divudi.entity.Speciality;
 import com.divudi.entity.Staff;
-import com.divudi.entity.inward.Admission;
 import com.divudi.entity.inward.AdmissionType;
 import com.divudi.entity.inward.PatientRoom;
 import com.divudi.facade.BillFacade;
@@ -887,7 +886,7 @@ public class BhtSummeryFinalizedController implements Serializable {
     public void errorCheck2() {
         String sql = "Select s from Speciality s where s.retired=false "
                 + " and s.name like '%Nurse%' ";
-        Speciality speciality = specialityFacade.findFirstBySQL(sql);
+        Speciality speciality = specialityFacade.findFirstByJpql(sql);
 
         for (Staff staff : fetchStaff()) {
             staff.setSpeciality(speciality);

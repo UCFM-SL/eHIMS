@@ -1,6 +1,6 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+* Dr M H B Ariyaratne
+ * buddhika.ari@gmail.com
  */
 package com.divudi.entity.lab;
 
@@ -16,8 +16,7 @@ import javax.persistence.InheritanceType;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class WorksheetItem extends ReportItem implements Serializable {
-    private static final long serialVersionUID = 1L;
-    
+
     
     
     

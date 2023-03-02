@@ -1,6 +1,6 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+* Dr M H B Ariyaratne
+ * buddhika.ari@gmail.com
  */
 package com.divudi.entity;
 
@@ -78,6 +78,8 @@ public class BillFee implements Serializable {
     Bill bill;
     ///////////////
     double feeValue = 0.0;
+    @Transient
+    private double absoluteFeeValue;
     Double feeGrossValue;
     double feeDiscount;
     double feeVat;
@@ -99,6 +101,8 @@ public class BillFee implements Serializable {
     double transNetValue;
     @ManyToOne
     private PatientRoom referencePatientRoom;
+    
+    
 
     public PriceMatrix getPriceMatrix() {
         return priceMatrix;
@@ -209,7 +213,7 @@ public class BillFee implements Serializable {
         return "com.divudi.entity.BillFee[ id=" + id + " ]";
     }
 
-    public void setFeeValue(boolean foriegn) {
+    public void setFeeValueBoolean(boolean foriegn) {
         if (tmpChangedValue != null) {
             this.feeGrossValue = tmpChangedValue;
             this.feeValue = tmpChangedValue;
@@ -314,7 +318,7 @@ public class BillFee implements Serializable {
     @Transient
     private Double tmpSettleChangedValue;
 
-        public void setFeeValueForCreditCompany(boolean foriegn, double discountPercent) {
+    public void setFeeValueForCreditCompany(boolean foriegn, double discountPercent) {
         if (tmpChangedValue == null) {
             if (getFee().getFeeType() != FeeType.Staff) {
                 if (foriegn) {
@@ -352,7 +356,7 @@ public class BillFee implements Serializable {
         }
     }
 
-    public void setFeeValue(boolean foriegn, double discountPercent) {
+    public void setFeeValueForeignAndDiscount(boolean foriegn, double discountPercent) {
 
         if (tmpChangedValue == null) {
             if (getFee().getFeeType() != FeeType.Staff) {
@@ -668,6 +672,11 @@ public class BillFee implements Serializable {
 
     public void setFeeVat(double feeVat) {
         this.feeVat = feeVat;
+    }
+
+    public double getAbsoluteFeeValue() {
+        absoluteFeeValue = Math.abs(feeValue);
+        return absoluteFeeValue;
     }
 
 }

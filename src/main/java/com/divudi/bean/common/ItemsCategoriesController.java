@@ -3,8 +3,8 @@
  *
  * Development and Implementation of Web-based System by ww.divudi.com
  Development and Implementation of Web-based System by ww.divudi.com
- * and
- * a Set of Related Tools
+ * (94) 71 5812399
+ * (94) 71 5812399
  */
 package com.divudi.bean.common;
 import com.divudi.entity.Category;
@@ -31,7 +31,7 @@ import javax.inject.Named;
 
 /**
  *
- * @author Dr. M. H. B. Ariyaratne, MBBS, PGIM Trainee for MSc(Biomedical
+ * @author Dr. M. H. B. Ariyaratne, MBBS, MSc, MD(Health Informatics)
  Informatics)
  */
 @Named
@@ -74,7 +74,7 @@ public class ItemsCategoriesController implements Serializable {
 
     private boolean checkItem() {
         String sql = "Select i from ItemsCategories i where i.retired=false and i.category.id= " + getCurrentCategory().getId() + " and i.item.id=" + getCurrentItem().getId();
-        ItemsCategories tmp = getFacade().findFirstBySQL(sql);
+        ItemsCategories tmp = getFacade().findFirstByJpql(sql);
         if (tmp != null) {
             return true;
         } else {
